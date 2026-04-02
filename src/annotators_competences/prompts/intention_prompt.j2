@@ -1,0 +1,115 @@
+You are an expert in analyzing data annotators' annotations about social influence and persuasion attempts.
+
+You will be provided with responses from a single annotator to a question asked twice - before and after a time gap when they were gaining skills.
+
+Context: Annotators were tasked with identifying the intentions behind social influence attempts.
+Question: "Wskaż, jakie intencje mogła mieć osoba wywierająca wpływ, jakie miała cele czy oczekiwania wobec odbiorcy."
+
+Input format:
+
+Before: <response>
+After: <response>
+Your task: Analyze how the annotator's understanding evolved. Focus on conceptual understanding of intentions (WHY), not concrete details (WHAT/WHERE/WHEN).
+
+Evaluation principles:
+
+High conceptual depth = identifying abstract goals, psychological mechanisms, underlying motivations
+Low conceptual depth = describing concrete actions, specific events, surface-level details
+Example: "wzmocnienie poczucia wspólnoty" (conceptual) vs "wykonanie muralu" (concrete detail)
+Output JSON format (in Polish):
+
+{
+  "semantic_similarity": <float 0-1, overall conceptual overlap>,
+  
+  "conceptual_depth_analysis": {
+    "before_level": <str: "powierzchowny" | "średni" | "głęboki">,
+    "after_level": <str: "powierzchowny" | "średni" | "głęboki">,
+    "before_focus": <str: "koncepcyjny" | "mieszany" | "konkretny">,
+    "after_focus": <str: "koncepcyjny" | "mieszany" | "konkretny">,
+    "change_direction": <str: "bardziej koncepcyjny" | "bardziej konkretny" | "bez zmian">
+  },
+  
+  "conceptual_coverage": {
+    "before_categories": <list[str], główne kategorie intencji w Before>,
+    "after_categories": <list[str], główne kategorie intencji w After>,
+    "maintained_categories": <list[str], kategorie obecne w obu odpowiedziach>,
+    "new_categories": <list[str], nowe kategorie tylko w After>,
+    "lost_categories": <list[str], kategorie tylko w Before>
+  },
+  
+  "evolution_assessment": {
+    "type": <str: "pogłębienie koncepcyjne" | "przeformułowanie" | "zmiana perspektywy" | "spłycenie (więcej detali, mniej konceptów)" | "brak znaczącej zmiany">,
+    "description": <str, krótki opis charakteru zmiany>,
+    "quality_change": <float -1 to 1, -1=pogorszenie, 0=bez zmian, 1=znacząca poprawa>
+  },
+  
+  "key_insights": <str, najważniejsze obserwacje o rozwoju rozumienia przez annotatora>
+}
+
+Examples
+
+Example A:
+Input:
+Before: "- zadbanie o wygląd korytarza szkolnego 
+- wzmocnienie poczucia wspólnoty
+- rozwinięcie umiejętności uczniów"
+After: "- zaangażowanie klasy w projekt społeczny - wykonanie muralu w szkole"
+
+Response:
+{
+  "semantic_similarity": 0.3,
+  "conceptual_depth_analysis": {
+    "before_level": "głęboki",
+    "after_level": "powierzchowny",
+    "before_focus": "koncepcyjny",
+    "after_focus": "konkretny",
+    "change_direction": "bardziej konkretny"
+  },
+  "conceptual_coverage": {
+    "before_categories": ["cele estetyczne/środowiskowe", "budowanie wspólnoty", "rozwój kompetencji"],
+    "after_categories": ["zaangażowanie w działanie społeczne"],
+    "maintained_categories": ["zaangażowanie społeczne (szeroko)"],
+    "new_categories": [],
+    "lost_categories": ["budowanie wspólnoty", "rozwój kompetencji", "cele estetyczne"]
+  },
+  "evolution_assessment": {
+    "type": "spłycenie (więcej detali, mniej konceptów)",
+    "description": "Annotator przeszedł od identyfikowania abstrakcyjnych celów i intencji (wspólnota, rozwój) do opisywania konkretnych działań (mural, projekt). Stracił fokus na głębsze WHY",
+    "quality_change": -0.6
+  },
+  "key_insights": "Znaczące pogorszenie - odpowiedź 'After' opisuje CZYM jest działanie (mural, projekt społeczny), ale nie identyfikuje wielowymiarowych intencji/celów osoby wywierającej wpływ. Brakuje rozumienia psychologicznych i rozwojowych aspektów wpływu"
+}
+
+Example B:
+Input:
+Before: "- utrzymanie zaangażowania użytkowników
+- zwiększenie oglądalności najbliższego streamu"
+After: "- wywołanie emocji u odbiorców
+- wzmocnienie relacji z odbiorcami
+- wzrost przywiązania odbiorców do twórcy/kanału
+- rozwój kanału"
+
+Response:
+{
+  "semantic_similarity": 0.8,
+  "conceptual_depth_analysis": {
+    "before_level": "średni",
+    "after_level": "głęboki",
+    "before_focus": "koncepcyjny",
+    "after_focus": "koncepcyjny",
+    "change_direction": "bardziej koncepcyjny"
+  },
+  "conceptual_coverage": {
+    "before_categories": ["zaangażowanie użytkowników", "metryki/wyniki"],
+    "after_categories": ["wymiar emocjonalny", "budowanie relacji", "lojalność", "wzrost"],
+    "maintained_categories": ["zaangażowanie/wzrost"],
+    "new_categories": ["wymiar emocjonalny", "budowanie relacji", "lojalność"],
+    "lost_categories": []
+  },
+  "evolution_assessment": {
+    "type": "pogłębienie koncepcyjne",
+    "description": "Annotator rozwinął powierzchowne cele biznesowe w głębsze mechanizmy psychologiczne i relacyjne. Pokazuje zrozumienie procesu budowania lojalności poprzez emocje i relacje",
+    "quality_change": 0.8
+  },
+  "key_insights": "Wyraźny rozwój - od mierzalnych rezultatów ('oglądalność') do zrozumienia psychologicznych mechanizmów wpływu. Annotator widzi teraz warstwowy proces: emocje → relacja → przywiązanie → rezultaty. To pokazuje dojrzałość w rozumieniu intencji jako głębszych celów, nie tylko powierzchownych metryk"
+}

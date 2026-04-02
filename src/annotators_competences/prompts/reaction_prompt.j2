@@ -1,0 +1,108 @@
+You are an expert in analyzing data annotators' annotations about reactions to social influence attempts.
+
+You will be provided with responses from a single annotator to a question asked twice - before and after a time gap when they were gaining skills.
+
+Context: Annotators were tasked with identifying how people reacted to social influence attempts.
+Question: "Jaka była reakcja osoby poddanej wpływowi społecznemu?"
+
+Input format:
+
+Before: <response>
+After: <response>
+Your task: Analyze how the annotator's understanding of psychological reactions evolved. Focus on internal psychological states and processes, not external outcomes or behaviors (unless they're direct manifestations of psychological states).
+
+Evaluation principles:
+
+High conceptual depth = identifying internal states (emotions, thoughts, cognitive processes), psychological mechanisms, nuanced emotional responses
+Low conceptual depth = describing only observable behaviors, concrete actions, outcomes that are results rather than reactions
+Good reaction identification = "wstyd", "samokrytyka", "porównywanie się" (internal psychological processes)
+Poor reaction identification = "zakup produktu", "poszedł tam" (external outcomes/behaviors, not psychological reactions)
+Note: Some behaviors CAN be reactions if they directly express psychological states (e.g., "nerwowy śmiech" as manifestation of stress/discomfort)
+Output JSON format (in Polish):
+
+{
+  "semantic_similarity": <float 0-1, overall conceptual overlap>,
+  
+  "psychological_depth_analysis": {
+    "before_level": <str: "powierzchowny" | "średni" | "głęboki">,
+    "after_level": <str: "powierzchowny" | "średni" | "głęboki">,
+    "before_focus": <str: "psychologiczny" | "mieszany" | "behawioralny/zewnętrzny">,
+    "after_focus": <str: "psychologiczny" | "mieszany" | "behawioralny/zewnętrzny">,
+    "change_direction": <str: "bardziej psychologiczny" | "bardziej behawioralny" | "bez zmian">
+  },
+  
+  "reaction_types_analysis": {
+    "before_types": <dict, {"emocjonalne": int, "kognitywne": int, "behawioralne_manifestacje": int, "zewnętrzne_wyniki": int}>,
+    "after_types": <dict, {"emocjonalne": int, "kognitywne": int, "behawioralne_manifestacje": int, "zewnętrzne_wyniki": int}>,
+    "emotional_granularity_change": <str: description of how emotional understanding changed>
+  },
+  
+  "conceptual_coverage": {
+    "before_categories": <list[str], główne kategorie reakcji w Before>,
+    "after_categories": <list[str], główne kategorie reakcji w After>,
+    "maintained_categories": <list[str], kategorie obecne w obu odpowiedziach>,
+    "new_categories": <list[str], nowe kategorie tylko w After>,
+    "lost_categories": <list[str], kategorie tylko w Before>
+  },
+  
+  "evolution_assessment": {
+    "type": <str: "pogłębienie psychologiczne" | "większa granulacja emocjonalna" | "zmiana perspektywy" | "spłycenie (fokus na zachowania)" | "brak znaczącej zmiany">,
+    "description": <str, krótki opis charakteru zmiany>,
+    "quality_change": <float -1 to 1, -1=pogorszenie, 0=bez zmian, 1=znacząca poprawa>
+  },
+  
+  "key_insights": <str, najważniejsze obserwacje o rozwoju rozumienia przez annotatora>
+}
+Example
+Input:
+Before: "poczucie wstydu,
+porównywanie się z innymi,
+zakup ekologicznego bidonu"
+
+After: "Wstyd
+Poczucie winy
+Porównywanie się z innymi
+Lęk o ocenę innych
+Stres
+Nerwowy śmiech
+Samokrytyka"
+
+Response:
+{
+  "semantic_similarity": 0.4,
+  "psychological_depth_analysis": {
+    "before_level": "średni",
+    "after_level": "głęboki",
+    "before_focus": "mieszany",
+    "after_focus": "psychologiczny",
+    "change_direction": "bardziej psychologiczny"
+  },
+  "reaction_types_analysis": {
+    "before_types": {
+      "emocjonalne": 1,
+      "kognitywne": 1,
+      "behawioralne_manifestacje": 0,
+      "zewnętrzne_wyniki": 1
+    },
+    "after_types": {
+      "emocjonalne": 4,
+      "kognitywne": 2,
+      "behawioralne_manifestacje": 1,
+      "zewnętrzne_wyniki": 0
+    },
+    "emotional_granularity_change": "Annotator przeszedł od ogólnego 'wstydu' do rozróżnienia wielowarstwowej reakcji emocjonalnej: wstyd, wina, lęk, stres. Pokazuje zrozumienie że wpływ społeczny wywołuje złożony zespół emocji, nie pojedyncze uczucie"
+  },
+  "conceptual_coverage": {
+    "before_categories": ["emocje negatywne (wstyd)", "procesy kognitywne (porównania społeczne)", "konkretne zachowania (zakup)"],
+    "after_categories": ["emocje negatywne samooceniające (wstyd, wina, samokrytyka)", "emocje społeczne (lęk o ocenę)", "stany napięcia (stres)", "procesy kognitywne (porównania)", "manifestacje behawioralne (nerwowy śmiech)"],
+    "maintained_categories": ["emocje negatywne", "procesy kognitywne porównań społecznych"],
+    "new_categories": ["emocje społeczne/lęk oceny", "stany napięcia", "poczucie winy", "samokrytyka", "manifestacje behawioralne dyskomfortu"],
+    "lost_categories": ["konkretne zachowania/wyniki"]
+  },
+  "evolution_assessment": {
+    "type": "pogłębienie psychologiczne",
+    "description": "Annotator znacząco rozwinął rozumienie psychologicznych reakcji na wpływ. Usunął nieadekwatny element (zakup jako wynik, nie reakcja) i dodał wielowymiarową analizę stanów wewnętrznych: emocje (4 różne), kognicje (porównania, samokrytyka), oraz behawioralną manifestację stresu (nerwowy śmiech)",
+    "quality_change": 0.85
+  },
+  "key_insights": "Znaczący rozwój kompetencji. Kluczowe zmiany: (1) Rozróżnienie reakcji vs. wyniku - usunięcie 'zakupu' pokazuje że annotator rozumie różnicę między wewnętrzną reakcją a zewnętrznym zachowaniem; (2) Granulacja emocjonalna - od pojedynczego 'wstydu' do różnicowania wstyd/wina/lęk/stres, co pokazuje sofistykację w rozumieniu stanów afektywnych; (3) Wielowymiarowość - identyfikacja reakcji emocjonalnych, kognitywnych i ich behawioralnych manifestacji; (4) Fokus na self-conscious emotions - wstyd, wina, samokrytyka, lęk o ocenę to wszystko emocje związane z oceną własnej osoby, co jest kluczowe w kontekście wpływu społecznego"
+}

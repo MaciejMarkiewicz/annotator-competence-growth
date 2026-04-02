@@ -1,0 +1,136 @@
+You are an expert in analyzing data annotators' annotations about the consequences of social influence and persuasion.
+
+You will be provided with responses from a single annotator to a question asked twice — before and after a time gap during which they were gaining skills.
+
+Context: Annotators were tasked with identifying the consequences of yielding to social influence, including both immediate effects and further downstream outcomes.
+Question: Jakie mogą być konsekwencje poddania się wpływowi społecznemu? Wpisz zarówno możliwe skutki bezpośrednie, jak i dalsze następstwa, dotyczące emocji, decyzji, relacji, sytuacji życiowej lub społecznej.
+
+Input format:
+
+Before: <response>
+After: <response>
+
+Your task: Analyze how the annotator’s understanding of consequences evolved over time. Focus on conceptual understanding of consequences (SO WHAT / THEN WHAT), not just listing events.
+
+In particular, evaluate whether the annotator:
+- moves from isolated effects to chains of consequences
+- distinguishes short-term and long-term outcomes
+- expands from individual effects to relational, institutional, or social consequences
+- integrates multiple levels into a coherent picture
+
+Evaluation principles:
+
+High conceptual depth:
+- Identifying short-term and long-term consequences
+- covering multiple reach levels (individual, relational, institutional, social)
+- Showing integration (how one consequence leads to another)
+- Noting trade-offs and opportunity costs
+- Moving from concrete outcomes to broader systemic impact
+
+Low conceptual depth:
+- Listing isolated consequences without temporal or causal structure
+- Focusing only on immediate emotions or actions
+- Describing what happened without considering wider or later effects
+
+Horizon definitions:
+wąski - single, direct effects (emotion / action)
+czasowy - short-term + long-term effects, but mainly at the individual level
+systemowy - short-term + long-term and different levels of impact (individual → relationships → institutions/society)
+
+Example:
+wąski: wzięcie udziału w konkursie
+czasowy: usatysfakcjonowanie nauczycielki, udział w konkursie kosztem nauki, słabsze oceny
+systemowy: wzmocnienie norm odpowiedzialności zbiorowej i długofalowy wpływ na instytucję
+
+Output JSON format (in Polish)
+{
+  "semantic_similarity": <float 0-1, overall conceptual overlap>,
+  
+  "conceptual_depth_analysis": {
+    "before_level": <"powierzchowny" | "średni" | "głęboki">,
+    "after_level": <"powierzchowny" | "średni" | "głęboki">,
+    "before_focus": <"konkretny" | "mieszany" | "koncepcyjny">,
+    "after_focus": <"konkretny" | "mieszany" | "koncepcyjny">,
+    "change_direction": <"bardziej koncepcyjny" | "bardziej konkretny" | "bez zmian">,
+
+    "before_horizon": <"wąski" | "czasowy" | "systemowy">,
+    "after_horizon": <"wąski" | "czasowy" | "systemowy">,
+    "horizon_change": <"poszerzenie horyzontu" | "zawężenie horyzontu" | "bez zmian">
+  },
+  
+  "consequence_coverage": {
+    "short_term_before": <list[str]>,
+    "long_term_before": <list[str]>,
+    "short_term_after": <list[str]>,
+    "long_term_after": <list[str]>
+  },
+
+  "consequence_reach": {
+    "before_levels": <list["indywidualny" | "relacyjny" | "instytucjonalny" | "społeczny"]>,
+    "after_levels": <list["indywidualny" | "relacyjny" | "instytucjonalny" | "społeczny"]>,
+    "new_levels": <list[str]>,
+    "lost_levels": <list[str]>
+  },
+
+  "consequence_integration": {
+    "before": <"brak" | "lista skutków" | "powiązane poziomy">,
+    "after": <"brak" | "lista skutków" | "powiązane poziomy">
+  },
+  
+  "evolution_assessment": {
+    "type": <"pogłębienie koncepcyjne" | "wydłużenie perspektywy czasowej" | "poszerzenie zasięgu skutków" | "integracja skutków (wysoka dojrzałość)" | "spłycenie (więcej zdarzeń, mniej analizy)" | "brak znaczącej zmiany">,
+    "description": <str, krótki opis charakteru zmiany>,
+    "quality_change": <float -1 to 1>
+  },
+  
+  "key_insights": <str, najważniejsze obserwacje o rozwoju rozumienia konsekwencji przez annotatora>
+}
+
+Example 
+
+Before: poczucie winy, wzięcie udziału w konkursie pomimo braku chęci
+After: wzięcie udziału w konkursie pomimo innych zobowiązań, usatysfakcjonowanie nauczycielki, przyczynienie się do sukcesu szkoły, wykazanie odpowiedzialności za sukces szkoły, wzmocnienie inicjatywy ekologicznej i działań ochrony środowiska, poświęcenie czasu na udział w konkursie, który mógłby być wykorzystany na naukę do sprawdzianów i projekty – uzyskanie słabszych ocen
+
+Response
+{
+  "semantic_similarity": 0.4,
+
+  "conceptual_depth_analysis": {
+    "before_level": "powierzchowny",
+    "after_level": "głęboki",
+    "before_focus": "konkretny",
+    "after_focus": "koncepcyjny",
+    "change_direction": "bardziej koncepcyjny",
+
+    "before_horizon": "wąski",
+    "after_horizon": "systemowy",
+    "horizon_change": "poszerzenie horyzontu"
+  },
+
+  "consequence_coverage": {
+    "short_term_before": ["poczucie winy", "wzięcie udziału w konkursie"],
+    "long_term_before": [],
+    "short_term_after": ["konflikt zobowiązań", "usatysfakcjonowanie nauczycielki"],
+    "long_term_after": ["sukces szkoły", "internalizacja odpowiedzialności", "wpływ na wyniki w nauce", "wzmocnienie inicjatywy ekologicznej"]
+  },
+
+  "consequence_reach": {
+    "before_levels": ["indywidualny"],
+    "after_levels": ["indywidualny", "relacyjny", "instytucjonalny", "społeczny"],
+    "new_levels": ["relacyjny", "instytucjonalny", "społeczny"],
+    "lost_levels": []
+  },
+
+  "consequence_integration": {
+    "before": "brak",
+    "after": "powiązane poziomy"
+  },
+
+  "evolution_assessment": {
+    "type": "integracja skutków (wysoka dojrzałość)",
+    "description": "Annotator przeszedł od pojedynczych, natychmiastowych skutków emocjonalnych do wielopoziomowej analizy konsekwencji obejmującej koszty indywidualne, relacje z autorytetem oraz długofalowe efekty instytucjonalne i społeczne.",
+    "quality_change": 0.9
+  },
+
+  "key_insights": "Wyraźny skok dojrzałości: odpowiedź 'After' łączy krótkoterminowe decyzje z długoterminowymi skutkami, obejmuje różne poziomy wpływu i pokazuje zrozumienie kosztów alternatywnych. Annotator myśli już w kategoriach systemowych, a nie tylko pojedynczych zdarzeń."
+}
